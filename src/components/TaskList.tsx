@@ -107,8 +107,6 @@ const TaskList = (props: Props) => {
     }
   }, [taskListData, status]);
 
-  console.log(dataBuffer);
-
   return (
     <div className="flex justify-center">
       <div className="w-[100%]">
