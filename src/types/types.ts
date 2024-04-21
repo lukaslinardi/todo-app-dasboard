@@ -26,6 +26,7 @@ export type TasksListSub = {
 export type UpdateTask = {
   id: number;
   task_name: string;
+  deadline_task: Moment | null;
 };
 
 export type CreateTask = {

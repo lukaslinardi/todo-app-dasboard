@@ -48,6 +48,7 @@ export const updateTask = async (body: UpdateTask) => {
       url: `${import.meta.env.VITE_REACT_API_URL}tasks/${body.id}`,
       data: {
         task_name: body.task_name,
+        deadline_task: body.deadline_task,
       },
     };
     const res = await axios(config);

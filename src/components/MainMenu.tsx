@@ -35,6 +35,8 @@ const MainMenu = () => {
     },
   });
 
+  console.log(reqBody.deadline_task);
+
   return (
     <div>
       <div className="flex justify-center items-center mt-[110px] w-full">
@@ -77,6 +79,7 @@ const MainMenu = () => {
                 slotProps={{
                   textField: { variant: "outlined", fullWidth: true },
                 }}
+                disablePast
                 value={reqBody.deadline_task}
                 onChange={(newValue) =>
                   setReqBody((prevValue) => ({

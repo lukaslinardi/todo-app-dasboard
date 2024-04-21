@@ -18,6 +18,9 @@ import {
   Collapse,
 } from "@mui/material";
 import moment from "moment";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 import {
   getTasksList,
@@ -47,7 +50,11 @@ const TaskList = (props: Props) => {
     modalState: false,
     modalType: 0,
   });
-  const [reqBody, setReqBody] = useState<UpdateTask>({ id: 0, task_name: "" });
+  const [reqBody, setReqBody] = useState<UpdateTask>({
+    id: 0,
+    task_name: "",
+    deadline_task: null,
+  });
 
   const { data: taskListData, status } = useQuery({
     queryKey: ["task-list"],
@@ -60,6 +67,11 @@ const TaskList = (props: Props) => {
   const { mutate: mutateUpdateTask } = useMutation({
     mutationFn: updateTask,
     onSuccess() {
+      setReqBody({
+        id: 0,
+        task_name: "",
+        deadline_task: null,
+      });
       setModalAttribute((prevValue) => ({
         ...prevValue,
         modalState: false,
@@ -107,6 +119,8 @@ const TaskList = (props: Props) => {
     }
   }, [taskListData, status]);
 
+  console.log(reqBody.deadline_task);
+
   return (
     <div className="flex justify-center">
       <div className="w-[100%]">
@@ -135,16 +149,17 @@ const TaskList = (props: Props) => {
                     data.parent_id === null &&
                     data.completion_percentage < 100,
                 )
-                .map((data, index) => (
+                .map((data) => (
                   <div
                     key={data.id}
                     className="border-2 border-black p-2 rounded-md text-[20px] mt-2 w-full "
                   >
-                    {data.parent_id !== null ? (
-                      <p>task completed: {data.completion_percentage} %</p>
-                    ) : (
-                      <p>task completed: 0 %</p>
-                    )}
+                    <p>
+                      task completed:
+                      {data.completion_percentage !== null
+                        ? data.completion_percentage + "%"
+                        : "0%"}
+                    </p>
                     <div className="flex justify-between items-center">
                       <div className="flex items-center">
                         <Checkbox
@@ -270,6 +285,39 @@ const TaskList = (props: Props) => {
                           </div>
                           {data.task_status === 1 ? (
                             <div>
+                              <button
+                                className="p-2 font-bold rounded-md border bg-blue-500 mr-3"
+                                onClick={() => {
+                                  setModalAttribute((prevValue) => ({
+                                    ...prevValue,
+                                    modalState: true,
+                                    modalType: 1,
+                                  }));
+                                  setReqBody((prevValue) => ({
+                                    ...prevValue,
+                                    id: data.id,
+                                    task_name: data.task_name,
+                                  }));
+                                }}
+                              >
+                                <EditIcon sx={{ color: "white" }} />
+                              </button>
+                              <button
+                                className="p-2 font-bold rounded-md border bg-red-500"
+                                onClick={() => {
+                                  setModalAttribute((prevValue) => ({
+                                    ...prevValue,
+                                    modalState: true,
+                                    modalType: 2,
+                                  }));
+                                  setReqBody((prevValue) => ({
+                                    ...prevValue,
+                                    id: data.id,
+                                  }));
+                                }}
+                              >
+                                <DeleteIcon sx={{ color: "white" }} />
+                              </button>
                               {moment(data.deadline_task).isSameOrBefore() ? (
                                 <div className="py-2 px-5 font-bold rounded-md bg-red-500 text-white">
                                   <p>Overdue</p>
@@ -395,6 +443,7 @@ const TaskList = (props: Props) => {
           {modalAttribute.modalType === 1 ? (
             <div className="m-3">
               <TextField
+                sx={{ marginBottom: 2 }}
                 label="Task Name"
                 fullWidth
                 value={reqBody.task_name}
@@ -405,6 +454,21 @@ const TaskList = (props: Props) => {
                   }));
                 }}
               />
+              <LocalizationProvider dateAdapter={AdapterMoment}>
+                <DatePicker
+                  slotProps={{
+                    textField: { variant: "outlined", fullWidth: true },
+                  }}
+                  disablePast
+                  value={reqBody.deadline_task}
+                  onChange={(newValue) =>
+                    setReqBody((prevValue) => ({
+                      ...prevValue,
+                      deadline_task: newValue,
+                    }))
+                  }
+                />
+              </LocalizationProvider>
             </div>
           ) : (
             <p>Are you sure to delete task name: {reqBody.task_name} ?</p>
