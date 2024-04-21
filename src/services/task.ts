@@ -1,7 +1,7 @@
 import axios from "axios";
 import { TasksList, UpdateTask, CreateTask } from "../types/types";
 
-export const getTasksList = async (): Promise<TasksList[]> => {
+export const getTasksList = async (): Promise<any> => {
   try {
     const config = {
       headers: {
@@ -28,6 +28,7 @@ export const createTask = async (body: CreateTask) => {
       data: {
         task_name: body.task_name,
         deadline_task: body.deadline_task,
+        parent_id: body.parent_id,
       },
     };
     const res = await axios(config);

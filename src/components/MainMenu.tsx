@@ -21,13 +21,14 @@ const MainMenu = () => {
   const [reqBody, setReqBody] = useState<CreateTask>({
     task_name: "",
     deadline_task: null,
+    parent_id: null,
   });
 
   const { mutate: mutateCreateTask } = useMutation({
     mutationFn: createTask,
     onSuccess() {
       setIsModalOpen(false);
-      setReqBody({ task_name: "", deadline_task: null });
+      setReqBody({ task_name: "", deadline_task: null, parent_id: null });
       queryClient.invalidateQueries({
         queryKey: ["task-list"],
       });
@@ -38,23 +39,20 @@ const MainMenu = () => {
     <div>
       <div className="flex justify-center items-center mt-[110px] w-full">
         <p className="font-bold text-blue-500 text-[50px]">Task List</p>
-        <button
-          className="py-2 px-5 bg-blue-500 text-white font-bold rounded-md"
-          onClick={() => setIsModalOpen(true)}
-        >
-          Create Task
-        </button>
       </div>
       <div className="flex justify-center">
         <div className="border border-black w-[50%] p-3 rounded-md">
-          <TaskList />
+          <TaskList
+            setIsModalOpen={setIsModalOpen}
+            setCreateTaskParent={setReqBody}
+          />
         </div>
       </div>
       <Dialog
         open={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
-          setReqBody({ task_name: "", deadline_task: null });
+          setReqBody({ task_name: "", deadline_task: null, parent_id: null });
         }}
         maxWidth="md"
         fullWidth
@@ -95,7 +93,11 @@ const MainMenu = () => {
             className="py-2 px-5 font-bold rounded-md border border-black w-full"
             onClick={() => {
               setIsModalOpen(false);
-              setReqBody({ task_name: "", deadline_task: null });
+              setReqBody({
+                task_name: "",
+                deadline_task: null,
+                parent_id: null,
+              });
             }}
           >
             Cancel
